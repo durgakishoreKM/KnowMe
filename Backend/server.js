@@ -9,7 +9,11 @@ import profileRoutes from "./routes/profileRoutes.js"
 
 const app = express()
 
-app.use(cors())
+app.use(
+  cors({
+    origin: "https://knowme-tau.vercel.app",
+  })
+);
 app.use(express.json())
 app.use("/api/users", userRoutes)
 app.use("/api/profile", profileRoutes)
