@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom"
 import SectionCard from "../components/SectionCard"
+import logo from "../assets/logo.png";
 
 function Home() {
   return (
@@ -7,9 +8,16 @@ function Home() {
 
       {/* NAVBAR */}
       <div className="max-w-6xl mx-auto px-6 py-6 flex justify-between items-center">
-        <h1 className="text-lg font-semibold tracking-tight text-indigo-600">
-          KnowMe
-        </h1>
+        <div className="flex items-center gap-3">
+          <img 
+            src={logo} 
+            alt="KnowMe Logo" 
+            className="h-9 w-9 object-contain transition-transform duration-300 hover:scale-110"
+          />
+          <h1 className="text-xl font-semibold tracking-tight text-indigo-600">
+            KnowMe
+          </h1>
+        </div>
 
         <Link to="/create">
           <button className="text-sm bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition">
