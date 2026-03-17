@@ -10,8 +10,8 @@ function CreateProfile() {
   const handleSubmit = async (e) => {
 
     e.preventDefault()
-
-    const response = await fetch("http://localhost:5000/api/profile", {
+    const API = import.meta.env.VITE_API_URL;
+    const response = await fetch(`${API}/api/profile`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

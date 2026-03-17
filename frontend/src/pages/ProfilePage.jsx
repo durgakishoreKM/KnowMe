@@ -10,8 +10,8 @@ function ProfilePage() {
   useEffect(() => {
 
     const fetchProfile = async () => {
-
-      const response = await fetch(`http://localhost:5000/api/profile/${username}`)
+      const API = import.meta.env.VITE_API_URL;
+      const response = await fetch(`${API}/api/profile/${username}`)
       const data = await response.json()
 
       setProfile(data)
