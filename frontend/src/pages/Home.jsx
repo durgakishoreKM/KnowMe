@@ -8,16 +8,13 @@ function Home() {
 
       {/* NAVBAR */}
       <div className="max-w-6xl mx-auto px-6 py-6 flex justify-between items-center">
-        <div className="flex items-center gap-3">
+        <Link to="/" className="flex items-center">
           <img 
-            src={logo} 
+            src={knowme_full_logo} 
             alt="KnowMe Logo" 
-            className="h-9 w-9 object-contain transition-transform duration-300 hover:scale-110"
+            className="h-12 w-auto object-contain transition-transform duration-300 hover:scale-105"
           />
-          <h1 className="text-xl font-semibold tracking-tight text-indigo-600">
-            KnowMe
-          </h1>
-        </div>
+        </Link>
 
         <Link to="/create">
           <button className="text-sm bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition">
