@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom"
 import SectionCard from "../components/SectionCard"
-import logo from "../assets/logo.png";
+import logo from "../assets/knowme_full_logo.png";
 
 function Home() {
   return (
