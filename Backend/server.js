@@ -1,31 +1,55 @@
-import dotenv from "dotenv"
-dotenv.config()
-import pool from './config/db.js';
+import dotenv from "dotenv";
+dotenv.config();
 
-import express from "express"
-import cors from "cors"
-import userRoutes from "./routes/userRoutes.js"
-import profileRoutes from "./routes/profileRoutes.js"
+import express from "express";
+import cors from "cors";
 
-const app = express()
+import authRoutes from "./routes/authRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import profileRoutes from "./routes/profileRoutes.js";
+import protect from "./middleware/authMiddleware.js";
 
+import pool from "./config/db.js"; // ✅ use consistent name
+
+const app = express();
+
+// ✅ Test DB connection (correct way)
+pool.query("SELECT 1")
+  .then(() => console.log("DB Connected ✅"))
+  .catch(err => console.error("DB Error ❌", err));
+
+// Middleware
 app.use(
   cors({
-    origin: "https://knowme-tau.vercel.app",
+    origin: [
+      "http://localhost:5173",
+      "https://knowme-tau.vercel.app",
+    ],
   })
 );
-app.use(express.json())
-app.use("/api/users", userRoutes)
-app.use("/api/profile", profileRoutes)
 
-// Root route
+app.use(express.json());
+
+// Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/profile", profileRoutes);
+
+// Test route
 app.get("/", (req, res) => {
-  res.send("KnowMe Backend Running")
-})
+  res.send("KnowMe Backend Running");
+});
 
-const PORT = 5000
+// Protected test route
+app.post("/api/profile", protect, (req, res) => {
+  res.json({
+    message: "Profile created",
+    user: req.user,
+  });
+});
+
+const PORT = 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-})
-
+  console.log(`Server running on port ${PORT}`);
+});
