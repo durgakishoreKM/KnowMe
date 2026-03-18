@@ -19,14 +19,7 @@ pool.query("SELECT 1")
   .catch(err => console.error("DB Error ❌", err));
 
 // Middleware
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      "https://knowme-tau.vercel.app",
-    ],
-  })
-);
+app.use(cors());
 
 app.use(express.json());
 
