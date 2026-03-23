@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import AuthModal from "./AuthModal";
 
-const Layout = ({ children }) => {
+const Layout = () => {
   const [showAuth, setShowAuth] = useState(false);
 
   return (
@@ -12,13 +13,11 @@ const Layout = ({ children }) => {
       <Navbar onAuthRequired={() => setShowAuth(true)} />
 
       <div className="pt-4">
-        {children}
+        <Outlet />   {/* 🔥 THIS IS THE FIX */}
       </div>
 
-      {/* Footer */}
       <Footer />
 
-      {/* Global Auth Modal */}
       <AuthModal
         isOpen={showAuth}
         onClose={() => setShowAuth(false)}
