@@ -44,7 +44,7 @@ function Home() {
           Create Story
         </button>
       </div>
-
+      <h1>BUILD_VERSION_12345</h1>
       {/* HERO */}
       <div className="max-w-4xl mx-auto px-6 pt-20 pb-16 text-center">
 
