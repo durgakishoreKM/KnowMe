@@ -1,12 +1,13 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"
 import { useState } from "react";
-import SectionCard from "../components/SectionCard";
+import SectionCard from "../components/SectionCard"
 import AuthModal from "../components/AuthModal";
 import { useAuth } from "../context/AuthContext";
 
 function Home() {
   const [showAuth, setShowAuth] = useState(false);
   const navigate = useNavigate();
+
   const { user } = useAuth();
 
   const handleCreateClick = () => {
@@ -29,17 +30,25 @@ function Home() {
 
       {/* HERO */}
       <div className="max-w-4xl mx-auto px-6 pt-20 pb-16 text-center">
+
         <h1 className="text-5xl md:text-6xl font-bold leading-tight tracking-tight">
           Say What Matters.
           <br />
           <span className="text-indigo-600">
-            Now or When It Matters Most.
+            Now — or When It Matters Most.
           </span>
         </h1>
 
         <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto">
-          Create stories, messages, jokes, or anything meaningful — and choose
-          when they should be seen. Public, private, or unlocked at the perfect moment.
+          Capture your stories, messages, thoughts, or anything you want to say —
+          and choose when they should be seen.
+          <br /><br />
+          Use AI to write, improve, or expand your message — then share it instantly
+          with a simple scan, and control when it becomes visible.
+        </p>
+
+        <p className="mt-4 text-sm text-gray-500">
+          A story, a message, a note, or even a joke — say it your way, or let AI help you.
         </p>
 
         <div className="mt-10 flex justify-center gap-4">
@@ -62,11 +71,13 @@ function Home() {
       {/* CORE BELIEF */}
       <div className="max-w-4xl mx-auto px-6 py-6 text-center">
         <p className="text-2xl font-semibold text-gray-800 leading-relaxed">
-          Some messages are meant for the right moment.
+          This message is meant for the future.
         </p>
 
         <p className="mt-4 text-lg text-gray-600">
-          “This message is meant for the future.”
+          Not everything needs to be shared now — some messages are meant to be discovered later.
+          <br />
+          Created today. Felt when it truly matters.
         </p>
       </div>
 
@@ -82,9 +93,11 @@ function Home() {
           </p>
 
           <p className="mt-6 text-lg text-gray-600 text-center">
-            KnowMe helps you capture your journey — your stories, lessons,
-            thoughts, or even a simple message — and share them in a way
-            that truly connects with others.
+            <span className="text-indigo-600 font-medium">
+              KnowMe helps you capture your journey
+            </span>{" "}
+            — your stories, thoughts, messages, or anything you want to express —
+            and turn them into something that can be shared, remembered, and discovered at the right time.
           </p>
         </SectionCard>
       </div>
@@ -97,24 +110,24 @@ function Home() {
 
         <div className="grid md:grid-cols-3 gap-8">
 
-          <div className="bg-white p-8 rounded-2xl shadow-sm">
-            <h3 className="text-lg font-semibold mb-2 text-indigo-600">Create</h3>
+          <div className="bg-gradient-to-b from-white via-purple-50 to-purple-100 p-8 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+            <h3 className="text-lg font-semibold mb-2 text-indigo-600">Write</h3>
             <p className="text-gray-600">
-              Write anything — a story, message, joke, or memory. Use AI to improve, expand, or make it more emotional.
+              Write your story, message, thought, or anything you want — or let AI help you improve, expand, or make it more emotional
             </p>
           </div>
 
-          <div className="bg-white p-8 rounded-2xl shadow-sm">
+          <div className="bg-gradient-to-b from-white via-purple-50 to-purple-100 p-8 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
             <h3 className="text-lg font-semibold mb-2 text-indigo-600">Choose</h3>
             <p className="text-gray-600">
-              Make it public, private, or “Open When…” it matters most.
+              Make it public, private, or “Open When…” it matters most
             </p>
           </div>
 
-          <div className="bg-white p-8 rounded-2xl shadow-sm">
+          <div className="bg-gradient-to-b from-white via-purple-50 to-purple-100 p-8 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
             <h3 className="text-lg font-semibold mb-2 text-indigo-600">Share</h3>
             <p className="text-gray-600">
-              Get a QR code and share anywhere — even before it unlocks.
+              Get a unique QR code to share anywhere — it opens instantly or unlocks when the time is right
             </p>
           </div>
 
@@ -129,15 +142,16 @@ function Home() {
           </h2>
 
           <p className="text-xl text-gray-700 font-semibold text-center">
-            A world where stories are felt, not just seen
+            A world where stories are felt — at the right time
           </p>
 
           <p className="mt-6 text-gray-700 leading-relaxed text-lg text-center">
-            We believe the most powerful stories aren’t the loudest —
-            they’re the most meaningful.
+            We believe the most powerful messages aren’t the loudest —
+            they’re the ones that stay with you.
             <br /><br />
             KnowMe is building a space where people can share real experiences,
-            leave something behind, and connect through moments that truly matter.
+            express anything that matters, and leave something behind —
+            not just for now, but for the moments that truly matter.
           </p>
         </SectionCard>
       </div>
@@ -155,20 +169,22 @@ function Home() {
         <div className="mt-8">
           <button
             onClick={handleCreateClick}
-            className="bg-white text-indigo-600 px-8 py-3 rounded-xl font-medium hover:bg-gray-100 transition"
+            className="bg-gradient-to-b from-white via-purple-50 to-purple-100 text-indigo-600 px-8 py-3 rounded-xl font-medium hover:bg-gray-100 transition"
           >
             Start Creating
           </button>
         </div>
       </div>
 
+      {/* AUTH MODAL */}
       <AuthModal
         isOpen={showAuth}
         onClose={() => setShowAuth(false)}
         onSuccess={handleAuthSuccess}
       />
+
     </div>
-  );
+  )
 }
 
-export default Home;
+export default Home
