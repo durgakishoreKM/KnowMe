@@ -24,7 +24,7 @@ export const createProfile = async (req, res) => {
     const profile = profileResult.rows[0]
 
     // profile URL
-    const profileUrl = `http://localhost:5173/u/${username}`
+    const profileUrl = `${process.env.FRONTEND_URL}/u/${username}`
 
     // generate QR
     const qrCode = await generateQRCode(profileUrl)
