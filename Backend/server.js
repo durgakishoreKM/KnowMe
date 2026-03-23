@@ -1,5 +1,4 @@
-import dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config";
 
 import express from "express";
 import cors from "cors";
@@ -7,7 +6,9 @@ import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
+import storyRoutes from "./routes/storyRoutes.js";
 import protect from "./middleware/authMiddleware.js";
+import aiRoutes from "./routes/ai.js";
 
 import pool from "./config/db.js"; // ✅ use consistent name
 
@@ -26,7 +27,9 @@ app.use(express.json());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/stories", storyRoutes);
 app.use("/api/profile", profileRoutes);
+app.use("/api/ai", aiRoutes);
 
 // Test route
 app.get("/", (req, res) => {
