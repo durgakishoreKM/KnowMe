@@ -98,7 +98,24 @@ router.get("/u/:username/:slug", async (req, res) => {
       return res.status(404).json({ error: "Story not found" });
     }
 
-    res.json(result.rows[0]);
+    const story = result.rows[0];
+    const now = new Date();
+
+    // 🔒 LOCKED CASE
+    if (story.unlock_at && now < new Date(story.unlock_at)) {
+      return res.json({
+        mode: "locked",
+        unlockAt: story.unlock_at,
+        title: story.title
+      });
+    }
+
+    // 📖 FULL STORY
+    return res.json({
+      mode: "full",
+      title: story.title,
+      content: story.content
+    });
 
   } catch (err) {
     console.error("FETCH STORY ERROR:", err);
