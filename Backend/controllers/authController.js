@@ -57,11 +57,18 @@ export const login = async (req, res) => {
     }
 
     const token = generateToken(user);
+    
+    const safeUser = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+    };
 
     res.json({
-      user,
+      user: safeUser,
       token,
     });
+
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
