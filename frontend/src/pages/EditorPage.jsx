@@ -121,7 +121,7 @@ const EditorPage = () => {
       console.log("Saved:", data);
 
       setSaving(false);
-      navigate(`/stories/u/${user.username}/${slug}`);
+      navigate(`/u/${user.username}/${slug}`);
     } catch (err) {
       console.error(err);
       setSaving(false);

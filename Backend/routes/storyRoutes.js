@@ -89,8 +89,10 @@ router.get("/u/:username/:slug", async (req, res) => {
     const { username, slug } = req.params;
 
     const result = await pool.query(
-      `SELECT * FROM stories 
-       WHERE slug = $1 AND username = $2`,
+      `SELECT s.*, u.username 
+       FROM stories s
+       JOIN users u ON s.user_id = u.id
+       WHERE s.slug = $1 AND u.username = $2`,
       [slug, username]
     );
 
@@ -101,7 +103,7 @@ router.get("/u/:username/:slug", async (req, res) => {
     const story = result.rows[0];
     const now = new Date();
 
-    // 🔒 LOCKED CASE
+    // 🔒 LOCKED
     if (story.unlock_at && now < new Date(story.unlock_at)) {
       return res.json({
         mode: "locked",
@@ -110,7 +112,7 @@ router.get("/u/:username/:slug", async (req, res) => {
       });
     }
 
-    // 📖 FULL STORY
+    // 📖 FULL
     return res.json({
       mode: "full",
       title: story.title,
@@ -122,6 +124,5 @@ router.get("/u/:username/:slug", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
-
 
 export default router;
