@@ -21,6 +21,7 @@ const Layout = () => {
       <AuthModal
         isOpen={showAuth}
         onClose={() => setShowAuth(false)}
+        onSuccess={() => setShowAuth(false)}
       />
 
     </div>

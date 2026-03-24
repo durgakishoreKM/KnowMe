@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import slugify from "slugify";
 
 const storyChapters = [
   {
@@ -50,6 +51,11 @@ const EditorPage = () => {
 
   // 🧠 Helpers
   const isStory = mode === "story";
+
+  const slug =
+        slugify(title, { lower: true, strict: true }) +
+        "-" +
+        Date.now();
 
   const handleChange = (e) => {
     const updated = [...answers];

@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import CreatePage from "./pages/CreatePage";
 import EditorPage from "./pages/EditorPage";
 import StoryPage from "./pages/StoryPage";
+import ProfilePage from "./pages/ProfilePage";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/create" element={<CreatePage />} />
         <Route path="/editor" element={<EditorPage />} />
         <Route path="/u/:username/:slug" element={<StoryPage />} />
+        <Route path="/u/:username" element={<ProfilePage />} />
 
       </Route>
 

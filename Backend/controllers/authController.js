@@ -5,7 +5,7 @@ import generateToken from "../utils/generateToken.js";
 // SIGNUP
 export const signup = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { username, email, password } = req.body;
 
     const userExists = await db.query(
       "SELECT * FROM users WHERE email = $1",
@@ -19,8 +19,8 @@ export const signup = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await db.query(
-      "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *",
-      [name, email, hashedPassword]
+      "INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *",
+      [username, email, hashedPassword]
     );
 
     const token = generateToken(newUser.rows[0]);

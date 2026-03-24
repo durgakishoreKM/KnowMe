@@ -4,15 +4,16 @@ import { useAuth } from "../context/AuthContext";
 export default function AuthModal({ isOpen, onClose, onSuccess }) {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
 
   const [form, setForm] = useState({
-    name: "",
+    username: "",
     email: "",
     password: "",
   });
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm({ ...form, [e.target. name]: e.target.value });
   };
 
   const handleSubmit = async () => {
@@ -20,7 +21,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
       setLoading(true);
 
       // Basic validation
-      if (!form.email || !form.password || (!isLogin && !form.name)) {
+      if (!form.email || !form.password || (!isLogin && !form.username)) {
         alert("Please fill all required fields");
         return;
       }
@@ -31,7 +32,11 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
 
       const payload = isLogin
         ? { email: form.email, password: form.password }
-        : form;
+        : {
+            username: form.username,
+            email: form.email,
+            password: form.password 
+          };
 
       const res = await fetch(import.meta.env.VITE_API_URL + url, {
         method: "POST",
@@ -48,14 +53,15 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
       }
 
       // ✅ Save token and user
-      const { login } = useAuth();
       login(data.user, data.token);
 
       // ✅ Trigger success (redirect handled in parent)
-      if (onSuccess) onSuccess();
+      if (onSuccess) {
+        onSuccess(data.user); // ✅ triggers modal close
+      }
 
       // Reset form
-      setForm({ name: "", email: "", password: "" });
+      setForm({ username: "", email: "", password: "" });
 
     } catch (err) {
       alert(err.message);
@@ -77,10 +83,11 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
         {/* NAME (only for signup) */}
         {!isLogin && (
           <input
-            name="name"
-            placeholder="Full Name"
-            value={form.name}
+            type="text"
+            name="username"
+            value={form.username}
             onChange={handleChange}
+            placeholder="Username"
             className="w-full border px-3 py-2 rounded mb-3"
           />
         )}
