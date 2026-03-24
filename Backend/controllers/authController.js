@@ -56,8 +56,11 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    const token = generateToken(user);
-    
+    const token = generateToken({
+      id: user.id,
+      username: user.username,
+    });
+
     const safeUser = {
       id: user.id,
       username: user.username,
@@ -70,7 +73,12 @@ export const login = async (req, res) => {
     });
 
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("LOGIN ERROR:", err);
+
+    // ✅ SAFE error response
+    res.status(500).json({
+      message: "Server error during login",
+    });
   }
 };
 
