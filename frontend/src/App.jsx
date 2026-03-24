@@ -19,6 +19,7 @@ function App() {
         <Route path="/create" element={<CreatePage />} />
         <Route path="/editor" element={<EditorPage />} />
         <Route path="/u/:username/:slug" element={<StoryPage />} />
+        <Route path="/stories/u/:username/:slug" element={<StoryPage />} />
         <Route path="/u/:username" element={<ProfilePage />} />
 
       </Route>
