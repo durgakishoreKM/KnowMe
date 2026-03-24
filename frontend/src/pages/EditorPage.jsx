@@ -48,14 +48,20 @@ const EditorPage = () => {
   const [saving, setSaving] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+  const [slug, setSlug] = useState("");
 
   // 🧠 Helpers
   const isStory = mode === "story";
 
-  const slug =
-        slugify(title, { lower: true, strict: true }) +
-        "-" +
-        Date.now();
+  let finalSlug = slug;
+
+  // ✅ generate slug ONLY if it doesn't exist
+  if (!finalSlug) {
+    finalSlug =
+      slugify(title, { lower: true, strict: true }) +
+      "-" +
+      Date.now();
+  }
 
   const handleChange = (e) => {
     const updated = [...answers];
@@ -118,10 +124,9 @@ const EditorPage = () => {
       );
 
       const data = await response.json();
-      console.log("Saved:", data);
-
+      setSlug(data.slug);
       setSaving(false);
-      navigate(`/u/${user.username}/${slug}`);
+      navigate(`/u/${user.username}/${data.slug}`);
     } catch (err) {
       console.error(err);
       setSaving(false);
