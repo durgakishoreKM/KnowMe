@@ -6,7 +6,20 @@ import generateToken from "../utils/generateToken.js";
 export const signup = async (req, res) => {
   try {
     const { username, email, password } = req.body;
+    // ✅ EMAIL VALIDATION
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: "Invalid email format" });
+    }
 
+    // ✅ PASSWORD VALIDATION
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{6,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        error:
+          "Password must be at least 6 characters and include at least 1 letter and 1 number",
+      });
+    }
     const userExists = await db.query(
       "SELECT * FROM users WHERE email = $1",
       [email]

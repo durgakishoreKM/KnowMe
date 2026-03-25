@@ -26,6 +26,22 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
         return;
       }
 
+      // ✅ EMAIL VALIDATION
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(form.email)) {
+        alert("Please enter a valid email");
+        return;
+      }
+
+      // ✅ PASSWORD VALIDATION
+      const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{6,}$/;
+      console.log(passwordRegex.test(form.password));
+      console.log(form.password);
+      if (!passwordRegex.test(form.password)) {
+        alert("Password must be at least 6 characters and include at least 1 letter and 1 number");
+        return;
+      }
+
       const url = isLogin
         ? "/api/auth/login"
         : "/api/auth/signup";
