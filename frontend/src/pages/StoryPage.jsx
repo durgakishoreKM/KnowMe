@@ -21,7 +21,7 @@ const StoryPage = () => {
 
         const data = await res.json();
 
-        // ✅ IMPORTANT CHANGE: accept mode-based response
+        // IMPORTANT CHANGE: accept mode-based response
         if (data && data.mode) {
           setStory(data);
         } else {
@@ -45,24 +45,72 @@ const StoryPage = () => {
   const shareUrl = `${window.location.origin}/u/${username}/${slug}`;
 
   const handleDownloadQR = () => {
-    const svg = qrRef.current?.querySelector("svg");
-    if (!svg) return;
+    try {
+      const qrContainer = qrRef.current;
+      if (!qrContainer) {
+        alert("QR not ready");
+        return;
+      }
 
-    const serializer = new XMLSerializer();
-    const source = serializer.serializeToString(svg);
+      const canvasEl = qrContainer.querySelector("canvas");
 
-    const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
+      if (!canvasEl) {
+        alert("QR not rendered yet");
+        return;
+      }
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "knowme-qr.svg";
-    a.click();
+      // create new canvas (bigger with title)
+      const finalCanvas = document.createElement("canvas");
+      finalCanvas.width = 320;
+      finalCanvas.height = 420;
 
-    URL.revokeObjectURL(url);
+      const ctx = finalCanvas.getContext("2d");
+
+      // background
+      const gradient = ctx.createLinearGradient(0, 0, 0, finalCanvas.height);
+      gradient.addColorStop(0, "#fdf2f8");
+      gradient.addColorStop(1, "#eef2ff");
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+
+      // title
+      ctx.fillStyle = "#111827";
+      ctx.font = "bold 20px sans-serif";
+      ctx.textAlign = "center";
+
+      const title = story?.title || "KnowMe Message";
+      ctx.fillText(title, finalCanvas.width / 2, 40);
+
+      // white card background
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(25, 60, 270, 270);
+
+      // draw QR
+      ctx.drawImage(canvasEl, 35, 70, 250, 250);
+
+      // footer
+      ctx.fillText("Scan to view", finalCanvas.width / 2, 340);
+
+      ctx.font = "12px sans-serif";
+      ctx.fillStyle = "#6b7280";
+      ctx.fillText("Created with KnowMe", finalCanvas.width / 2, 390);
+
+      // download
+      const url = finalCanvas.toDataURL("image/png");
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "knowme-share.png";
+      a.click();
+
+    } catch (err) {
+      console.error("QR DOWNLOAD ERROR:", err);
+      alert("Download failed");
+    }
   };
 
-  // ❌ NOT FOUND
+  // NOT FOUND
   if (story === null) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -71,7 +119,7 @@ const StoryPage = () => {
     );
   }
 
-  // 🔒 LOCKED STATE
+  // LOCKED STATE
   if (story.mode === "locked") {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center text-center px-6">
@@ -124,9 +172,21 @@ const StoryPage = () => {
 
           <div
             ref={qrRef}
-            className="inline-block p-4 bg-white rounded-xl shadow-sm"
+            className="inline-block p-6 bg-white rounded-xl shadow-sm text-center"
           >
-            <QRWithLogo url={shareUrl} />
+            {/* TITLE ABOVE QR */}
+            <p className="text-sm font-semibold mb-2 text-gray-700">
+              {story.title || "KnowMe Message"}
+            </p>
+
+            <div ref={qrRef}>
+              <QRWithLogo url={shareUrl} />
+            </div>
+
+            {/* SMALL BRANDING */}
+            <p className="text-xs text-gray-400 mt-2">
+              Scan to view
+            </p>
           </div>
 
           <p className="text-xs text-gray-400 mt-2">
@@ -145,7 +205,7 @@ const StoryPage = () => {
               onClick={handleDownloadQR}
               className="px-4 py-2 bg-indigo-600 text-white rounded-md"
             >
-              Download QR
+              Download Share Image
             </button>
           </div>
         </div>
