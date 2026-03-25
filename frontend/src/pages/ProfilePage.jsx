@@ -24,6 +24,24 @@ const ProfilePage = () => {
     if (user) fetchStories();
   }, [user]);
 
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this story?")) {
+      return;
+    }
+
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL}/stories/${id}`, {
+        method: "DELETE",
+      });
+
+      setStories((prev) => prev.filter((story) => story.id !== id));
+
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete story");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-purple-50 to-purple-100 text-gray-900 px-6 py-10">
       <div className="max-w-3xl mx-auto">
@@ -115,15 +133,29 @@ const ProfilePage = () => {
                   }
                   className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md cursor-pointer transition"
                 >
-                  <h3 className="font-medium text-gray-900">
-                    {story.title || "Untitled"}
-                  </h3>
+                  {/* 🔥 Top row: Title + Delete */}
+                  <div className="flex justify-between items-start">
+                    <h3 className="font-medium text-gray-900">
+                      {story.title || "Untitled"}
+                    </h3>
 
-                  <p className="text-sm text-gray-500 mt-1">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation(); // ✅ prevent navigation
+                        handleDelete(story.id);
+                      }}
+                      className="text-xs px-2 py-1 text-red-500 border border-red-200 rounded-md hover:bg-red-50 transition"
+                    >
+                      Delete
+                    </button>
+                  </div>
+
+                  {/* 📄 Content */}
+                  <p className="text-sm text-gray-500 mt-2">
                     {story.content?.slice(0, 80)}...
                   </p>
 
-                  {/* 🔥 Type badge */}
+                  {/* 🔥 Bottom row */}
                   <div className="flex justify-between items-center mt-3">
                     <span className="text-xs px-2 py-1 bg-gray-100 rounded-full">
                       {story.type || "story"}
