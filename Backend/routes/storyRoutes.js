@@ -125,4 +125,18 @@ router.get("/u/:username/:slug", async (req, res) => {
   }
 });
 
+router.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await pool.query("DELETE FROM stories WHERE id = $1", [id]);
+
+    res.json({ message: "Story deleted" });
+
+  } catch (err) {
+    console.error("DELETE STORY ERROR:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 export default router;
