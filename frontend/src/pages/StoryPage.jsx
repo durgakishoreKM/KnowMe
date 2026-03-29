@@ -15,7 +15,7 @@ const StoryPage = () => {
     const fetchStory = async () => {
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/stories/u/${username}/${slug}`,
+          `${import.meta.env.VITE_API_URL}/api/stories/u/${username}/${slug}`,
           { cache: "no-store" }
         );
 
@@ -136,7 +136,7 @@ const StoryPage = () => {
     );
   }
 
-  // 📖 FULL STORY
+  // FULL STORY
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-purple-100 text-gray-800 px-6 py-16">
 

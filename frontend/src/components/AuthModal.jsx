@@ -35,8 +35,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
 
       // ✅ PASSWORD VALIDATION
       const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{6,}$/;
-      console.log(passwordRegex.test(form.password));
-      console.log(form.password);
       if (!passwordRegex.test(form.password)) {
         alert("Password must be at least 6 characters and include at least 1 letter and 1 number");
         return;
@@ -67,6 +65,9 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
       if (!res.ok) {
         throw new Error(data.message || "Something went wrong");
       }
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
       // ✅ Save token and user
       login(data.user, data.token);

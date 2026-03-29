@@ -4,9 +4,15 @@ import OpenAI from "openai";
 const cache = new Map();
 const router = express.Router();
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const client = () => {
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error("OPENAI_API_KEY missing");
+  }
+
+  return new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+};
 
 router.post("/enhance", async (req, res) => {
   try {
@@ -14,7 +20,7 @@ router.post("/enhance", async (req, res) => {
 
     const cacheKey = `${type}-${text}`;
 
-    // ✅ Check cache first
+    // Check cache first
     if (cache.has(cacheKey)) {
     console.log("⚡ Cache hit");
     return res.json({ result: cache.get(cacheKey) });
