@@ -5,8 +5,6 @@ import slugify from "slugify";
 // CREATE STORY
 export const createStory = async (req, res) => {
   const { title, content, visibility } = req.body;
-  console.log("req.body:", req.body);
-  console.log("req.user:", req.user);
   const userId = req.user.id;
   if (!userId) {
     return res.status(400).json({ error: "User not found" });
@@ -85,8 +83,6 @@ export const getStoriesByUser = async (req, res) => {
     let query = "";
     let values = [];
 
-    console.log("currentUserId:", currentUserId);
-    console.log("userId:", userId);
     if (currentUserId == userId) {
       // 👤 Owner → see all
       query = "SELECT * FROM stories WHERE user_id = $1 ORDER BY created_at DESC";
@@ -100,7 +96,6 @@ export const getStoriesByUser = async (req, res) => {
     const result = await db.query(query, values);
 
     res.json(result.rows);
-    console.log("USER QUERY RESULT:", result.rows);
 
   } catch (err) {
     console.error(err);

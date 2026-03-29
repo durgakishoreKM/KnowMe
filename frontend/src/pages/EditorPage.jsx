@@ -107,7 +107,6 @@ const EditorPage = () => {
       }
 
       const token = localStorage.getItem("token");
-      console.log("TOKEN:", token);
 
       if (!token) {
         console.error("No token found. User not logged in.");

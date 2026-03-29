@@ -10,7 +10,9 @@ import { authMiddleware, optionalAuth } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// CREATE STORY
+//
+// ✅ CREATE STORY (Protected)
+//
 router.post("/", authMiddleware, async (req, res) => {
   try {
     const { title, content, visibility } = req.body;
@@ -50,50 +52,18 @@ router.post("/", authMiddleware, async (req, res) => {
   }
 });
 
+//
+// ✅ GET ALL STORIES BY USER (Public)
+//
+router.get("/user/:userId", getStoriesByUser);
 
-// GET ALL STORIES BY USER
-router.get("/user/:userId", async (req, res) => {
-  const { userId } = req.params;
-
-  try {
-    const stories = await pool.query(
-      "SELECT * FROM stories WHERE user_id = $1 ORDER BY created_at DESC",
-      [userId]
-    );
-
-    res.json(stories.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Failed to fetch stories" });
-  }
-});
-
-
-// GET SINGLE STORY BY ID
-router.get("/:storyId", async (req, res) => {
-  const { storyId } = req.params;
-
-  try {
-    const result = await pool.query(
-      "SELECT * FROM stories WHERE id = $1",
-      [storyId]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "Story not found" });
-    }
-
-    res.json(result.rows[0]); // 👈 return object (NOT array)
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Failed to fetch story" });
-  }
-});
-
+//
+// ✅ GET STORY BY USERNAME + SLUG (Public + Optional Auth)
+//
 router.get("/u/:username/:slug", optionalAuth, async (req, res) => {
   try {
     const { username, slug } = req.params;
-    const currentUserId = req.user?.id; // may be undefined if not logged in
+    const currentUserId = req.user?.id;
 
     const result = await pool.query(
       `SELECT s.*, u.username 
@@ -110,14 +80,8 @@ router.get("/u/:username/:slug", optionalAuth, async (req, res) => {
     const story = result.rows[0];
     const now = new Date();
 
-    // VISIBILITY CHECKS
-    // Public → allow
-    if (story.visibility === "public") {
-      // continue
-    }
-
-    // Followers Only
-    else if (story.visibility === "followers") {
+    // 🔐 VISIBILITY LOGIC
+    if (story.type === "followers") {
       if (!currentUserId) {
         return res.status(401).json({ error: "Login required" });
       }
@@ -129,14 +93,13 @@ router.get("/u/:username/:slug", optionalAuth, async (req, res) => {
       }
     }
 
-    // Private (only owner)
-    else if (story.visibility === "private") {
+    if (story.type === "private") {
       if (story.user_id !== currentUserId) {
         return res.status(403).json({ error: "Not allowed" });
       }
     }
 
-    // LOCKED (your existing feature)
+    // 🔒 LOCKED FEATURE
     if (story.unlock_at && now < new Date(story.unlock_at)) {
       return res.json({
         mode: "locked",
@@ -145,7 +108,7 @@ router.get("/u/:username/:slug", optionalAuth, async (req, res) => {
       });
     }
 
-    // FULL ACCESS
+    // ✅ FULL ACCESS
     return res.json({
       mode: "full",
       title: story.title,
@@ -158,21 +121,25 @@ router.get("/u/:username/:slug", optionalAuth, async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+//
+// ✅ GET SINGLE STORY BY ID (Public)
+//
+router.get("/:id", getStoryById);
+
+//
+// ✅ DELETE STORY (Protected)
+//
+router.delete("/:id", authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
 
     await pool.query("DELETE FROM stories WHERE id = $1", [id]);
 
     res.json({ message: "Story deleted" });
-
   } catch (err) {
     console.error("DELETE STORY ERROR:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
-
-router.get("/:id", getStoryById);
-router.get("/user/:userId", authMiddleware, getStoriesByUser);
 
 export default router;
