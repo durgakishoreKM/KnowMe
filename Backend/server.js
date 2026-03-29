@@ -1,4 +1,5 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+dotenv.config({ path: "./.env" });
 
 import express from "express";
 import cors from "cors";
@@ -7,39 +8,40 @@ import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import storyRoutes from "./routes/storyRoutes.js";
-import protect from "./middleware/authMiddleware.js";
+import followRoutes from "./routes/followRoutes.js";
 import aiRoutes from "./routes/ai.js";
 
-import pool from "./config/db.js"; // ✅ use consistent name
+import { authMiddleware } from "./middleware/authMiddleware.js";
+import pool from "./config/db.js";
 
 const app = express();
 
-// ✅ Test DB connection (correct way)
+// DB Connection Test
 pool.query("SELECT 1")
   .then(() => console.log("DB Connected ✅"))
   .catch(err => console.error("DB Error ❌", err));
 
 // Middleware
 app.use(cors());
-
 app.use(express.json());
 
-// Routes
+// Routes (CLEAN STRUCTURE)
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
-app.use("/stories", storyRoutes);
 app.use("/api/profile", profileRoutes);
+app.use("/api/stories", storyRoutes);
+app.use("/api/follow", followRoutes);
 app.use("/api/ai", aiRoutes);
 
-// Test route
+// Health Check
 app.get("/", (req, res) => {
-  res.send("KnowMe Backend Running");
+  res.send("KnowMe Backend Running 🚀");
 });
 
-// Protected test route
-app.post("/api/profile", protect, (req, res) => {
+// Protected Test Route
+app.get("/api/test-protected", authMiddleware, (req, res) => {
   res.json({
-    message: "Profile created",
+    message: "Protected route works ✅",
     user: req.user,
   });
 });

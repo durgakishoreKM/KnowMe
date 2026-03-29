@@ -1,6 +1,9 @@
 import jwt from "jsonwebtoken";
 
-const protect = (req, res, next) => {
+//
+// 🔐 STRICT AUTH (for protected routes)
+//
+export const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -9,13 +12,46 @@ const protect = (req, res, next) => {
 
   try {
     const token = authHeader.split(" ")[1];
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    console.log("DECODED TOKEN (authMiddleware):", decoded);
 
     req.user = decoded;
     next();
   } catch (error) {
+    console.error("AUTH ERROR:", error.message);
     return res.status(401).json({ message: "Token failed" });
   }
 };
 
-export default protect;
+
+//
+// 🌐 OPTIONAL AUTH (for public routes)
+//
+export const optionalAuth = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  // No token → allow guest
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    req.user = null;
+    return next();
+  }
+
+  try {
+    const token = authHeader.split(" ")[1];
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    console.log("DECODED TOKEN (optional):", decoded);
+
+    req.user = decoded;
+    next();
+  } catch (error) {
+    console.error("OPTIONAL AUTH ERROR:", error.message);
+
+    // Even if token is invalid → don't block
+    req.user = null;
+    next();
+  }
+};

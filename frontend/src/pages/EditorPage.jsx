@@ -50,12 +50,14 @@ const EditorPage = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [slug, setSlug] = useState("");
 
+  const [visibility, setVisibility] = useState("public");
+
   // 🧠 Helpers
   const isStory = mode === "story";
 
   let finalSlug = slug;
 
-  // ✅ generate slug ONLY if it doesn't exist
+  // generate slug ONLY if it doesn't exist
   if (!finalSlug) {
     finalSlug =
       slugify(title, { lower: true, strict: true }) +
@@ -91,7 +93,7 @@ const EditorPage = () => {
       .join("");
   };
 
-  // 💾 SAVE
+  // SAVE
   const handleSave = async () => {
     try {
       setSaving(true);
@@ -104,26 +106,44 @@ const EditorPage = () => {
         content = answers[0]; // message / openwhen uses single input
       }
 
-      console.log(user.username);
+      const token = localStorage.getItem("token");
+      console.log("TOKEN:", token);
+
+      if (!token) {
+        console.error("No token found. User not logged in.");
+        setSaving(false);
+        return;
+      }
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/stories`,
+        `${import.meta.env.VITE_API_URL}/api/stories`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // REQUIRED
           },
           body: JSON.stringify({
             title: title || "My Life Story",
             content: content,
-            username: user.username,
-            userId: user.id,
-            type: mode,
-          })
+            visibility: visibility || "public", // NEW
+          }),
         }
       );
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("CREATE FAILED:", errorData);
+        setSaving(false);
+        return;
+      }
+
       const data = await response.json();
+      if (!data?.slug) {
+        console.error("Slug missing:", data);
+        setSaving(false);
+        return;
+      }
       setSlug(data.slug);
       setSaving(false);
       navigate(`/u/${user.username}/${data.slug}`);
@@ -235,6 +255,16 @@ const EditorPage = () => {
             >
               ← Back to Editing
             </button>
+
+            <select
+              value={visibility}
+              onChange={(e) => setVisibility(e.target.value)}
+              className="border p-2 rounded-lg mt-4"
+            >
+              <option value="public">🌍 Public</option>
+              <option value="followers">🔒 Followers Only</option>
+              <option value="private">📝 Only Me</option>
+            </select>
 
             <button
               onClick={handleSave}

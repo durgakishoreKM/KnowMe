@@ -6,13 +6,13 @@ import generateToken from "../utils/generateToken.js";
 export const signup = async (req, res) => {
   try {
     const { username, email, password } = req.body;
-    // ✅ EMAIL VALIDATION
+    // EMAIL VALIDATION
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ error: "Invalid email format" });
     }
 
-    // ✅ PASSWORD VALIDATION
+    // PASSWORD VALIDATION
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{6,}$/;
     if (!passwordRegex.test(password)) {
       return res.status(400).json({
@@ -88,7 +88,7 @@ export const login = async (req, res) => {
   } catch (err) {
     console.error("LOGIN ERROR:", err);
 
-    // ✅ SAFE error response
+    // SAFE error response
     res.status(500).json({
       message: "Server error during login",
     });

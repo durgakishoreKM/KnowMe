@@ -1,14 +1,20 @@
 import express from "express";
 import pool from "../config/db.js";
 import slugify from "slugify";
+import {
+  createStory,
+  getStoryById,
+  getStoriesByUser
+} from "../controllers/storyController.js";
+import { authMiddleware, optionalAuth } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-
-// ✅ CREATE STORY
-router.post("/", async (req, res) => {
+// CREATE STORY
+router.post("/", authMiddleware, async (req, res) => {
   try {
-    const { title, content, userId, type } = req.body;
+    const { title, content, visibility } = req.body;
+    const userId = req.user.id;
 
     if (!title && !content) {
       return res.status(400).json({ message: "Empty story" });
@@ -32,9 +38,9 @@ router.post("/", async (req, res) => {
 
     const newStory = await pool.query(
       `INSERT INTO stories (title, content, slug, username, user_id, type)
-      VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING *`,
-      [title, content, slug, username, userId, type]
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING *`,
+      [title, content, slug, username, userId, visibility]
     );
 
     res.json(newStory.rows[0]);
@@ -45,7 +51,7 @@ router.post("/", async (req, res) => {
 });
 
 
-// ✅ GET ALL STORIES BY USER
+// GET ALL STORIES BY USER
 router.get("/user/:userId", async (req, res) => {
   const { userId } = req.params;
 
@@ -63,7 +69,7 @@ router.get("/user/:userId", async (req, res) => {
 });
 
 
-// ✅ GET SINGLE STORY BY ID
+// GET SINGLE STORY BY ID
 router.get("/:storyId", async (req, res) => {
   const { storyId } = req.params;
 
@@ -84,9 +90,10 @@ router.get("/:storyId", async (req, res) => {
   }
 });
 
-router.get("/u/:username/:slug", async (req, res) => {
+router.get("/u/:username/:slug", optionalAuth, async (req, res) => {
   try {
     const { username, slug } = req.params;
+    const currentUserId = req.user?.id; // may be undefined if not logged in
 
     const result = await pool.query(
       `SELECT s.*, u.username 
@@ -103,7 +110,33 @@ router.get("/u/:username/:slug", async (req, res) => {
     const story = result.rows[0];
     const now = new Date();
 
-    // 🔒 LOCKED
+    // VISIBILITY CHECKS
+    // Public → allow
+    if (story.visibility === "public") {
+      // continue
+    }
+
+    // Followers Only
+    else if (story.visibility === "followers") {
+      if (!currentUserId) {
+        return res.status(401).json({ error: "Login required" });
+      }
+
+      const isFollower = await checkFollow(currentUserId, story.user_id);
+
+      if (!isFollower) {
+        return res.status(403).json({ error: "Followers only" });
+      }
+    }
+
+    // Private (only owner)
+    else if (story.visibility === "private") {
+      if (story.user_id !== currentUserId) {
+        return res.status(403).json({ error: "Not allowed" });
+      }
+    }
+
+    // LOCKED (your existing feature)
     if (story.unlock_at && now < new Date(story.unlock_at)) {
       return res.json({
         mode: "locked",
@@ -112,7 +145,7 @@ router.get("/u/:username/:slug", async (req, res) => {
       });
     }
 
-    // 📖 FULL
+    // FULL ACCESS
     return res.json({
       mode: "full",
       title: story.title,
@@ -138,5 +171,8 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+router.get("/:id", getStoryById);
+router.get("/user/:userId", authMiddleware, getStoriesByUser);
 
 export default router;

@@ -11,17 +11,30 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchStories = async () => {
       try {
+        const token = localStorage.getItem("token");
+
         const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/stories/user/${user.id}`
+          `${import.meta.env.VITE_API_URL}/api/stories/user/${user.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // 🔐 REQUIRED
+            },
+          }
         );
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch stories");
+        }
+
         const data = await res.json();
         setStories(data);
+
       } catch (err) {
-        console.error(err);
+        console.error("FETCH STORIES ERROR:", err);
       }
     };
 
-    if (user) fetchStories();
+    if (user?.id) fetchStories();
   }, [user]);
 
   const handleDelete = async (id) => {
@@ -30,7 +43,7 @@ const ProfilePage = () => {
     }
 
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/stories/${id}`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/stories/${id}`, {
         method: "DELETE",
       });
 
@@ -150,6 +163,13 @@ const ProfilePage = () => {
                     </button>
                   </div>
 
+                  {/* ✅ Add visibility badge HERE */}
+                  <span className="text-xs text-gray-500 block mt-1">
+                    {story.visibility === "public" && "🌍 Public"}
+                    {story.visibility === "followers" && "🔒 Followers"}
+                    {story.visibility === "private" && "📝 Only Me"}
+                  </span>
+                  
                   {/* 📄 Content */}
                   <p className="text-sm text-gray-500 mt-2">
                     {story.content?.slice(0, 80)}...
