@@ -14,9 +14,23 @@ const StoryPage = () => {
   useEffect(() => {
     const fetchStory = async () => {
       try {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          console.error("No token found. User not logged in.");
+          return;
+        }
+
         const res = await fetch(
           `${import.meta.env.VITE_API_URL}/api/stories/u/${username}/${slug}`,
-          { cache: "no-store" }
+          { 
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`, // REQUIRED
+            },
+            cache: "no-store"
+          }
         );
 
         const data = await res.json();

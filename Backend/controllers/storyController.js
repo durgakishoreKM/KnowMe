@@ -31,6 +31,8 @@ export const getStoryById = async (req, res) => {
   const { id } = req.params;
   const userId = req.user?.id;
 
+  console.log("userId", userId);
+  console.log("id", req.params);
   try {
     const result = await db.query(
       "SELECT * FROM stories WHERE id = $1",
@@ -38,6 +40,7 @@ export const getStoryById = async (req, res) => {
     );
 
     const story = result.rows[0];
+    console.log("story", story);
     if (!story) return res.status(404).json({ message: "Not found" });
 
     // Public
@@ -59,7 +62,8 @@ export const getStoryById = async (req, res) => {
 
       return res.json(story);
     }
-
+    console.log("story.user_id", story.user_id);
+    console.log("userId", userId)
     // Private
     if (story.visibility === "private") {
       if (story.user_id !== userId) {
