@@ -79,6 +79,14 @@ router.get("/u/:username/:slug", optionalAuth, async (req, res) => {
 
     const story = result.rows[0];
     const now = new Date();
+    
+    if (story.type === "public") {
+      return res.json({
+        mode: "full",
+        title: story.title,
+        content: story.content
+      });
+    }
 
     // 🔐 VISIBILITY LOGIC
     if (story.type === "followers") {

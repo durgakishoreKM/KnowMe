@@ -28,16 +28,19 @@ export const authMiddleware = (req, res, next) => {
 // 🌐 OPTIONAL AUTH (for public routes)
 //
 export const optionalAuth = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-
-  // No token → allow guest
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    req.user = null;
-    return next();
-  }
-
   try {
+    const authHeader = req.headers.authorization;
+
+    // No token → allow guest
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      req.user = null;
+      return next();
+    }
+  
     const token = authHeader.split(" ")[1];
+    if (!token) {
+      return next();
+    }
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
     req.user = decoded;
