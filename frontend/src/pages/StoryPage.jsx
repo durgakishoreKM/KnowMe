@@ -16,18 +16,13 @@ const StoryPage = () => {
       try {
         const token = localStorage.getItem("token");
 
-        if (!token) {
-          console.error("No token found. User not logged in.");
-          return;
-        }
-
         const res = await fetch(
           `${import.meta.env.VITE_API_URL}/api/stories/u/${username}/${slug}`,
           { 
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`, // REQUIRED
+              ...(token && { Authorization: `Bearer ${token}` }), // ✅ optional
             },
             cache: "no-store"
           }
