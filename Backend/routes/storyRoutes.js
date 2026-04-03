@@ -11,7 +11,7 @@ import { authMiddleware, optionalAuth } from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 //
-// ✅ CREATE STORY (Protected)
+// CREATE STORY (Protected)
 //
 router.post("/", authMiddleware, async (req, res) => {
   try {
@@ -53,12 +53,12 @@ router.post("/", authMiddleware, async (req, res) => {
 });
 
 //
-// ✅ GET ALL STORIES BY USER (Public)
+// GET ALL STORIES BY USER (Public)
 //
 router.get("/user/:userId", getStoriesByUser);
 
 //
-// ✅ GET STORY BY USERNAME + SLUG (Public + Optional Auth)
+// GET STORY BY USERNAME + SLUG (Public + Optional Auth)
 //
 router.get("/u/:username/:slug", optionalAuth, async (req, res) => {
   try {
@@ -79,12 +79,14 @@ router.get("/u/:username/:slug", optionalAuth, async (req, res) => {
 
     const story = result.rows[0];
     const now = new Date();
-    
-    if (story.type === "public") {
+
+    // 🔒 LOCKED FEATURE
+    if (story.unlock_at && now < new Date(story.unlock_at)) {
       return res.json({
-        mode: "full",
+        mode: "locked",
+        unlockAt: story.unlock_at,
         title: story.title,
-        content: story.content
+        type: story.type // add this
       });
     }
 
@@ -106,21 +108,21 @@ router.get("/u/:username/:slug", optionalAuth, async (req, res) => {
         return res.status(403).json({ error: "Not allowed" });
       }
     }
-
-    // 🔒 LOCKED FEATURE
-    if (story.unlock_at && now < new Date(story.unlock_at)) {
+    
+    if (story.type === "public") {
       return res.json({
-        mode: "locked",
-        unlockAt: story.unlock_at,
-        title: story.title
+        mode: "full",
+        title: story.title,
+        content: story.content
       });
     }
 
-    // ✅ FULL ACCESS
+    // FULL ACCESS
     return res.json({
       mode: "full",
       title: story.title,
-      content: story.content
+      content: story.content,
+      type: story.type
     });
 
   } catch (err) {
@@ -130,12 +132,12 @@ router.get("/u/:username/:slug", optionalAuth, async (req, res) => {
 });
 
 //
-// ✅ GET SINGLE STORY BY ID (Public)
+// GET SINGLE STORY BY ID (Public)
 //
 router.get("/:id", getStoryById);
 
 //
-// ✅ DELETE STORY (Protected)
+// DELETE STORY (Protected)
 //
 router.delete("/:id", authMiddleware, async (req, res) => {
   try {

@@ -11,20 +11,24 @@ const getTimeRemaining = (unlockAt) => {
   return { total, days, hours, minutes, seconds };
 };
 
-const CountdownTimer = ({ unlockAt }) => {
+const CountdownTimer = ({ unlockAt, onUnlock }) => {
   const [time, setTime] = useState(getTimeRemaining(unlockAt));
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTime(getTimeRemaining(unlockAt));
+      const updated = getTimeRemaining(unlockAt);
+      setTime(updated);
+
+      if (updated.total <= 0) {
+        clearInterval(interval);
+        if (onUnlock) onUnlock(); // call parent callback
+      }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [unlockAt]);
+  }, [unlockAt, onUnlock]);
 
-  if (time.total <= 0) {
-    return <p className="text-green-600 font-semibold">Unlocked 🎉</p>;
-  }
+  if (time.total <= 0) return <p className="text-green-600 font-semibold">Unlocked 🎉</p>;
 
   return (
     <div className="text-lg font-medium text-purple-700">
