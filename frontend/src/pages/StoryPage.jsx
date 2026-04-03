@@ -32,7 +32,7 @@ const StoryPage = () => {
 
         const data = await res.json();
 
-        if (res.status === 403 && data.unlock_at) {
+        if (data && data.unlock_at) {
           setLocked(true);
           setUnlockDate(new Date(data.unlock_at));
           setStory({
@@ -138,11 +138,12 @@ const StoryPage = () => {
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
             {story.title || "Untitled"}
           </h1>
+          
           {locked && unlockDate && (
             <div className="mt-2 text-gray-500 text-sm flex flex-col items-center gap-1">
               <span>🔒 Will unlock in:</span>
               <CountdownTimer
-                unlockAt={story.unlockAt}
+                unlockAt={story.unlock_at}
                 onUnlock={async () => {
                   const token = localStorage.getItem("token");
                   const res = await fetch(`${import.meta.env.VITE_API_URL}/api/stories/u/${username}/${slug}`, {

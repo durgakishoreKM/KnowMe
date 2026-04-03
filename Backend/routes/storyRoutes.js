@@ -15,7 +15,7 @@ const router = express.Router();
 //
 router.post("/", authMiddleware, async (req, res) => {
   try {
-    const { title, content, visibility } = req.body;
+    const { title, content, type, visibility, unlock_at} = req.body;
     const userId = req.user.id;
 
     if (!title && !content) {
@@ -39,10 +39,10 @@ router.post("/", authMiddleware, async (req, res) => {
     const username = userResult.rows[0].username;
 
     const newStory = await pool.query(
-      `INSERT INTO stories (title, content, slug, username, user_id, type)
-       VALUES ($1, $2, $3, $4, $5, $6)
+      `INSERT INTO stories (title, content, slug, username, user_id, type, visibility, unlock_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING *`,
-      [title, content, slug, username, userId, visibility]
+      [title, content, slug, username, userId, type, visibility, unlock_at]
     );
 
     res.json(newStory.rows[0]);
@@ -78,20 +78,24 @@ router.get("/u/:username/:slug", optionalAuth, async (req, res) => {
     }
 
     const story = result.rows[0];
-    const now = new Date();
+    const now = new Date().getTime(); // current time in ms
+    const unlockTime = story.unlock_at
+      ? new Date(story.unlock_at).getTime()
+      : null;
 
-    // 🔒 LOCKED FEATURE
-    if (story.unlock_at && now < new Date(story.unlock_at)) {
+    if (unlockTime && now < unlockTime) {
       return res.json({
         mode: "locked",
-        unlockAt: story.unlock_at,
+        unlock_at: story.unlock_at,
         title: story.title,
-        type: story.type // add this
+        content: story.content,
+        type: story.type,
+        visibility: story.visibility
       });
     }
 
     // 🔐 VISIBILITY LOGIC
-    if (story.type === "followers") {
+    if (story.visibility === "followers") {
       if (!currentUserId) {
         return res.status(401).json({ error: "Login required" });
       }
@@ -103,13 +107,13 @@ router.get("/u/:username/:slug", optionalAuth, async (req, res) => {
       }
     }
 
-    if (story.type === "private") {
+    if (story.visibility === "private") {
       if (story.user_id !== currentUserId) {
         return res.status(403).json({ error: "Not allowed" });
       }
     }
     
-    if (story.type === "public") {
+    if (story.visibility === "public") {
       return res.json({
         mode: "full",
         title: story.title,
