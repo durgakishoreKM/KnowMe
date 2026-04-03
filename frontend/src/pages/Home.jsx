@@ -51,7 +51,7 @@ function Home() {
             {/* CTA BUTTONS */}
             <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
               <button
-                onClick={() => handleCreate()}
+                onClick={() => handleCreateClick()}
                 className="bg-purple-600 text-white px-6 py-3 rounded-xl text-lg font-medium hover:bg-purple-700 transition shadow-md"
               >
                 Start Your Story
@@ -120,7 +120,7 @@ function Home() {
             {/* CTA */}
             <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
               <button
-                onClick={() => handleCreate()}
+                onClick={() => handleCreateClick()}
                 className="bg-purple-600 text-white px-6 py-3 rounded-xl text-lg font-medium hover:bg-purple-700 transition shadow-md"
               >
                 Start Creating
