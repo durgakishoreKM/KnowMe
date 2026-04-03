@@ -113,6 +113,7 @@ const EditorPage = () => {
         body: JSON.stringify({
           title: storyTitle,
           content,
+          type: mode,
           visibility: visibility || "public",
           unlock_at: unlockISO
         }),
